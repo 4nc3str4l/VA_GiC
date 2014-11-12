@@ -1,25 +1,25 @@
-import cv
+import cv2
 
-font = cv.InitFont(cv.CV_FONT_HERSHEY_SIMPLEX, 1, 1, 0, 3, 8)
-
-def writeText(text,x,y,size,frame):
-	cv.PutText(frame,text, (x,y),font, size)
+def writeText(text, pos, size, frame):
+	cv2.putText(frame, text, pos, cv2.FONT_HERSHEY_SIMPLEX, size, (255,255,255))
 
 
 if __name__=='__main__':
 
 	numframes = 0
-	capture = cv.CaptureFromCAM(0)
-	cv.NamedWindow('image')
+	capture = cv2.VideoCapture(0)
+	cv2.namedWindow('image')
 
 	while True:
-		frame = cv.QueryFrame(capture)
-		writeText("Informacio:(esc per sortir)",50,50,200,frame)
-		writeText("Frames: "+str(numframes),50,80,200,frame)
-		cv.ShowImage('image',frame)
+		_,frame = capture.read()
+		writeText("Informacio:(esc per sortir)", (50,50), 1, frame)
+		writeText("Frames: " + str(numframes), (50,80), 1, frame)
+		cv2.imshow('image', frame)
 
-		k = cv.WaitKey(10)
+		k = cv2.waitKey(10)
 		numframes += 1
-		if k % 256 == 27:
+		if k & 0xFF == 27:
 			break
-	cv.DestroyWindow('image')
+
+	cv2.destroyAllWindows()
+	capture.release()
