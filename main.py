@@ -98,19 +98,23 @@ if __name__ == '__main__':
 							#cv2.circle(recognition, ctr[2], 5, (0, 0, 255), 5)
 							cv2.rectangle(recognition, rect[0], rect[1], (255, 0, 0), 2)
 
-				boxes,_ = cv2.groupRectangles(centroids, 0)
+				if centroids != []:
+					boxes,_ = cv2.groupRectangles(centroids, 0)
 
-				mask = np.zeros((frame.shape[0], frame.shape[1], 1), 'uint8')
+					mask = np.zeros((frame.shape[0], frame.shape[1], 1), 'uint8')
 
-				for b in boxes:
-					area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
-					mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
+					for b in boxes:
+						area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
+						mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
 
-				applied = np.multiply(BG, mask.squeeze()).astype('uint8')
-				contours,_ = cv2.findContours(applied, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-				cv2.imshow('Applied', mask * 255)
-				cv2.drawContours(applied, contours, -1, (255, 0, 255))
-				applied = cv2.medianBlur(applied, 5)
+					applied = np.multiply(BG, mask.squeeze()).astype('uint8')
+					print mask
+					contours,_ = cv2.findContours(applied, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+					cv2.drawContours(applied, contours, -1, (255, 0, 255))
+
+					mask = cv2.medianBlur(mask, 9)
+					cv2.imshow('Applied', mask * 255)
+					cv2.imshow('contours', applied)
 
 				"""
 				# Find boxes by looking for radius distances
