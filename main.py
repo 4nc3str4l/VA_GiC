@@ -38,7 +38,7 @@ if __name__ == '__main__':
 	deiluminate = np.zeros((frame.shape[0], frame.shape[1], 1))
 	substraction = np.zeros((frame.shape[0], frame.shape[1], 1))
 	recognition = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
-	applied = np.zeros((frame.shape[0], frame.shape[1], 1))
+	applied = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
 
 	while True:
 		_,frame = capture.read()
@@ -75,9 +75,9 @@ if __name__ == '__main__':
 				recognition[:,:,0] = np.zeros((mostChanges.shape[0], mostChanges.shape[1]))
 				recognition[:,:,2] = np.zeros((mostChanges.shape[0], mostChanges.shape[1]))
 
-				# Apply K windows of size k
+				# Apply K windows of size k to find centroids
 				centroids = []
-				k = (10, 10)
+				k = (20, 20)
 				for i in xrange(1, mostChanges.shape[0], k[0]):
 					for j in xrange(1, mostChanges.shape[1], k[1]):
 						# Get centroid points
@@ -108,19 +108,49 @@ if __name__ == '__main__':
 					boxes,_ = cv2.groupRectangles(centroids, 0)
 
 					mask = np.zeros((frame.shape[0], frame.shape[1], 1), 'uint8')
+					applied = np.zeros((frame.shape[0], frame.shape[1], 1))
 
 					for b in boxes:
 						area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
 						mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
 
 					mask = cv2.medianBlur(mask, 9)#Intentem que no quedin forats
-					applied = np.multiply(gray, mask)
-					napp = (applied*255).astype('uint8')
-					contours,_ = cv2.findContours(napp, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-					cv2.drawContours(napp, contours, -1, 255, 1, 8)
+					mask = np.multiply(gray, mask)
+					mask = (mask*255).astype('uint8')
+					contours,_ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-					cv2.imshow('Applied', applied)
-					cv2.imshow('contours', napp)
+					#cv2.imshow('Applied', applied)
+					#cv2.imshow('contours', mask)
+
+					applied = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
+					applied[:,:,0] = mask
+
+					i = 0
+					for c in contours:
+						leftmost = c[:,:,0].min()
+						rightmost = c[:,:,0].max()
+						topmost = c[:,:,1].min()
+						bottommost = c[:,:,1].max()
+
+						min_area = 10000
+						area = ((rightmost - leftmost)*(bottommost-topmost))
+						if area < min_area:
+							continue
+
+						if i%2 == 0:
+							ch = np.array(applied[:,:,1])
+							cv2.drawContours(ch, c, -1, (250), 5)
+							applied[:,:,1] = ch
+						else:
+							ch = np.array(applied[:,:,2])
+							cv2.drawContours(ch, c, -1, (250), 5)
+							applied[:,:,2] = ch
+
+						i = i + 1
+
+						obj = gray[topmost:bottommost,leftmost:rightmost]
+						cv2.imshow('Obj' + str(i), obj)
+
 
 				"""
 				# Find boxes by looking for radius distances
@@ -240,9 +270,7 @@ if __name__ == '__main__':
 		"""
 
 		applied = applied.squeeze()
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 0] = applied
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 1] = applied
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 2] = applied
+		window[0:windowSize[0], windowSize[1]:windowSize[1]*2] = applied
 
 		#sums = [1*a0+2*a1+4*a3+8*a4+16*a5+32*a6+64*a7*128*a8 for a0,a1,a2,a3,a4,a6,a7,a8,a9]
 		# Bottom left: Substraction
