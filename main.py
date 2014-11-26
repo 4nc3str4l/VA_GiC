@@ -162,16 +162,15 @@ if __name__ == '__main__':
 		# Top-Left: Background
 		window.showGrayAt((0, 0, windowSize[0], windowSize[1]), BG)
 
-		# Top-Right
+		# Top-Right: Substraction
 		applied = applied.squeeze()
-		window.showAt((0, windowSize[1], windowSize[0], windowSize[1]*2), applied)
+		window.showGrayAt((0, windowSize[1], windowSize[0], windowSize[1]*2), substraction)
 
-		#sums = [1*a0+2*a1+4*a3+8*a4+16*a5+32*a6+64*a7*128*a8 for a0,a1,a2,a3,a4,a6,a7,a8,a9]
-		# Bottom left: Substraction
-		window.showGrayAt((windowSize[0], 0, windowSize[0]*2, windowSize[1]), substraction)
+		# Bottom-Left: Recognition
+		window.showAt((windowSize[0], 0, windowSize[0]*2, windowSize[1]), recognition)
 
-		# Bottom right: 1st stage recognition
-		window.showAt((windowSize[0], windowSize[1], windowSize[0]*2, windowSize[1]*2), recognition)
+		# Bottom-Right: Object segmentation
+		window.showAt((windowSize[0], windowSize[1], windowSize[0]*2, windowSize[1]*2), applied)
 
 		window.text("Informacio:(esc per sortir)", (50,50), 1)
 		window.text("Frames: " + str(numframes), (50,80), 1)
