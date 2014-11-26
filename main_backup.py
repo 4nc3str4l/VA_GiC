@@ -1,17 +1,19 @@
 import cv2
 import numpy as np
 import math
+from itertools import izip_longest
+
+
+def grouper(iterable, n, fillvalue=None):
+	args = [iter(iterable)] * n
+	return izip_longest(*args, fillvalue=fillvalue)
 
 # Background subtraction applied to object recognition
 
 def writeText(text, pos, size, frame):
 	cv2.putText(frame, text, pos, cv2.FONT_HERSHEY_SIMPLEX, size, (255,255,255))
 
-def boxCollision(a, b):
-	return not (b[0][0] > a[1][0] \
-        or b[1][0] < a[0][0] \
-        or b[0][1] > a[1][1] \
-        or b[1][1] < a[0][1])
+
 
 W = []
 w = 20
@@ -32,7 +34,6 @@ if __name__ == '__main__':
 	deiluminate = np.zeros((frame.shape[0], frame.shape[1], 1))
 	substraction = np.zeros((frame.shape[0], frame.shape[1], 1))
 	recognition = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
-	applied = np.zeros((frame.shape[0], frame.shape[1], 1))
 
 	while True:
 		_,frame = capture.read()
@@ -52,7 +53,6 @@ if __name__ == '__main__':
 
 				# Compute which area changes the most compared to the backgound
 				mostChanges = np.abs(sum(W-BG))
-				preThreshold = mostChanges
 
 				# Saturate
 				mostChanges = (mostChanges.clip(0, max=1)*255).astype('uint8')
@@ -72,48 +72,27 @@ if __name__ == '__main__':
 				# Apply K windows of size k
 				centroids = []
 				k = (50, 50)
+				mi = int(math.floor(mostChanges.shape[0] / k[0]))
+				mj = int(math.floor(mostChanges.shape[1] / k[1]))
 				for i in xrange(1, mostChanges.shape[0], k[0]):
 					for j in xrange(1, mostChanges.shape[1], k[1]):
-						# Get centroid points
-						points = np.argwhere(mostChanges[i:i+k[0],j:j+k[0]])
-
 						# Find centroid
-						x_coords = [i + p[0] for p in points]
-						y_coords = [j + p[1] for p in points]
+						points = [p for p in zip(xrange(i,i+k[0]), xrange(j,j+k[1])) if p[0] < mostChanges.shape[0] and p[1] < mostChanges.shape[1] and mostChanges[p[0], p[1]] == 255]
+						x_coords = [p[0] for p in points]
+						y_coords = [p[1] for p in points]
 							
 						_len = len(x_coords)
 						if _len > 0:
 							center = (sum(y_coords)/_len, sum(x_coords)/_len)
-
-							# [x1, y1, x2, y2, (cx, cy)]
-							rect = [(center[0] - k[1]/2, center[1] - k[0]/2),\
+							ctr = [(center[0] - k[1]/2, center[1] - k[0]/2),\
 									(center[0] + k[1]/2, center[1] + k[0]/2),\
 									center]
 
-							# [x, y, w, h]
-							ctr = (center[0] - k[1]/2, center[1] - k[0]/2, k[0], k[1])
-
 							centroids.append(ctr)
 
-							#cv2.circle(recognition, ctr[2], 5, (0, 0, 255), 5)
-							cv2.rectangle(recognition, rect[0], rect[1], (255, 0, 0), 2)
+							cv2.circle(recognition, ctr[2], 5, (0, 0, 255), 5)
+							cv2.rectangle(recognition, ctr[0], ctr[1], (255, 0, 0), 2)
 
-				boxes,_ = cv2.groupRectangles(centroids, 0)
-
-				mask = np.zeros((frame.shape[0], frame.shape[1], 1), 'uint8')
-
-				for b in boxes:
-					area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
-					mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
-
-				applied = np.multiply(BG, mask.squeeze()).astype('uint8')
-				contours,_ = cv2.findContours(applied, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-				cv2.imshow('Applied', mask * 255)
-				cv2.drawContours(applied, contours, -1, (255, 0, 255))
-				applied = cv2.medianBlur(applied, 5)
-
-				"""
-				# Find boxes by looking for radius distances
 				found = 1
 				while found > 0 and centroids != []:
 					found = 0
@@ -127,7 +106,7 @@ if __name__ == '__main__':
 					
 					minDist = min(distances)
 
-					if minDist[0] < k[0]*2 or boxCollision(minDist[1], origin):
+					if minDist[0] < k[0]*2:
 						found = found + 1
 						centroid = minDist[1]
 						centroids.remove(centroid)
@@ -151,34 +130,13 @@ if __name__ == '__main__':
 					else:
 						centroids.append(origin)
 
-				# Look for boxes by finding collisions
-				found = 1
-				while found:
-					exit = 0
-					found = 0
-					for ctr1 in centroids:
-						for ctr2 in centroids:
-							if ctr1 == ctr2:
-								continue
-						
-							if boxCollision(ctr1, ctr2):
-								left = min((ctr1[0][0], ctr2[0][0]))
-								top = min((ctr1[0][1], ctr2[0][1]))
-								right = max((ctr1[1][0], ctr2[1][0]))
-								bot = max((ctr1[1][1], ctr2[1][1]))
+				copy = centroids[::]
+				for ctr1 in copy:
+					for ctr2 in copy:
+						if ctr1 == ctr2:
+							continue
 
-								centroids.remove(ctr1)
-								centroids.remove(ctr2)
 
-								ctr = [(left, top), (right, bot)] + ctr1[2:] + ctr2[2:] + [((left+right)/2, (left+right)/2)]
-								centroids.append(ctr)
-
-								found = 1
-								exit = 1
-								break
-
-						if exit:
-							break
 
 				for ctr in centroids:
 					p1 = np.array(ctr[0]).clip(0)
@@ -187,8 +145,11 @@ if __name__ == '__main__':
 					p2 = np.array(ctr[1]).clip(0)
 					p2 = (p2[0], p2[1])
 
-					cv2.rectangle(recognition, p1, p2, (255, 255, 255), 3)
-				"""
+					print "At:",p1,p2
+
+					cv2.rectangle(recognition, p1, p2, (255, 255, 255), 1)
+				
+				print
 
 				m = difference.argmin()
 				BG = (1-alpha)*BG + alpha * W[m]
@@ -228,11 +189,6 @@ if __name__ == '__main__':
 			]
 		]
 		"""
-
-		applied = applied.squeeze()
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 0] = applied
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 1] = applied
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2, 2] = applied
 
 		#sums = [1*a0+2*a1+4*a3+8*a4+16*a5+32*a6+64*a7*128*a8 for a0,a1,a2,a3,a4,a6,a7,a8,a9]
 		# Bottom left: Substraction
