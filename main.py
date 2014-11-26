@@ -2,21 +2,24 @@ import cv2
 import numpy as np
 import math
 import platform
+import utils
 
-# Background subtraction applied to object recognition
+########################################################
+# Background subtraction applied to object recognition #
+########################################################
 
-def writeText(text, pos, size, frame):
-	cv2.putText(frame, text, pos, cv2.FONT_HERSHEY_SIMPLEX, size, (255,255,255))
-
-def boxCollision(a, b):
-	return not (b[0][0] > a[1][0] \
-        or b[1][0] < a[0][0] \
-        or b[0][1] > a[1][1] \
-        or b[1][1] < a[0][1])
-
+# Windows array
 W = []
+# Number of frames to sample before substraction happens
 w = 20
+# Learning rate
 alpha = 0.1
+# Minimum area of an object (in pixels^2)
+min_area = 10000
+# Centroids window size
+k = (20, 20)
+
+# Background initialization
 BG = None
 
 if __name__ == '__main__':
@@ -33,8 +36,10 @@ if __name__ == '__main__':
 	_,frame = capture.read()
 
 	windowSize = frame.shape
+	window = utils.Window(windowSize[0]*2, windowSize[1]*2)
+	window.open('BSaOR')
 
-	window = np.zeros((frame.shape[0]*2, frame.shape[1]*2, frame.shape[2]))
+	#window = np.zeros((frame.shape[0]*2, frame.shape[1]*2, frame.shape[2]))
 	deiluminate = np.zeros((frame.shape[0], frame.shape[1], 1))
 	substraction = np.zeros((frame.shape[0], frame.shape[1], 1))
 	recognition = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
@@ -77,7 +82,6 @@ if __name__ == '__main__':
 
 				# Apply K windows of size k to find centroids
 				centroids = []
-				k = (20, 20)
 				for i in xrange(1, mostChanges.shape[0], k[0]):
 					for j in xrange(1, mostChanges.shape[1], k[1]):
 						# Get centroid points
@@ -132,7 +136,6 @@ if __name__ == '__main__':
 						topmost = c[:,:,1].min()
 						bottommost = c[:,:,1].max()
 
-						min_area = 10000
 						area = ((rightmost - leftmost)*(bottommost-topmost))
 						if area < min_area:
 							continue
@@ -157,59 +160,27 @@ if __name__ == '__main__':
 
 		# Set window parameters
 		# Top-Left: Background
-		window[0:windowSize[0], 0:windowSize[1], 0] = BG;
-		window[0:windowSize[0], 0:windowSize[1], 1] = BG;
-		window[0:windowSize[0], 0:windowSize[1], 2] = BG;
-		# Top right: Deiluminate
+		window.showGrayAt((0, 0, windowSize[0], windowSize[1]), BG)
 
-		# This is way WAY WAAAY to slow
-		"""
-		# Window size is 3x3 ~ 8 bits ~ 255 intensity
-		g = [np.dot((gray[i-1:i+2,j-1:j+2] < gray[i,j]).flatten(), (1,2,4,8,0,16,32,64,128)) \
-				for i in xrange(1, gray.shape[0]-1) \
-				for j in xrange(1, gray.shape[1]-1)]
-		g = np.array(g, np.uint8).reshape((gray.shape[0]-2, gray.shape[1]-2))
-
-		min_ = np.min(np.min(g))
-		max_ = np.max(np.max(g))
-		g = (g-min_)/(max_-min_)
-
-		window[1:windowSize[0]-1, windowSize[1]+1:windowSize[1]*2-1, 0] = g;
-		window[1:windowSize[0]-1, windowSize[1]+1:windowSize[1]*2-1, 1] = g;
-		window[1:windowSize[0]-1, windowSize[1]+1:windowSize[1]*2-1, 2] = g;
-		
-		[
-			[
-				[ 0.34901962  0.44313726  0.51372552]
-  				[ 0.33725491  0.43529412  0.49803922]
-  			]
- 			[
- 				[ 0.30588236  0.4509804   0.50588238]
-  				[ 0.30980393  0.44705883  0.50196081]
-			]
-		]
-		"""
-
+		# Top-Right
 		applied = applied.squeeze()
-		window[0:windowSize[0], windowSize[1]:windowSize[1]*2] = applied
+		window.showAt((0, windowSize[1], windowSize[0], windowSize[1]*2), applied)
 
 		#sums = [1*a0+2*a1+4*a3+8*a4+16*a5+32*a6+64*a7*128*a8 for a0,a1,a2,a3,a4,a6,a7,a8,a9]
 		# Bottom left: Substraction
-		window[windowSize[0]:windowSize[0]*2, 0:windowSize[1], 0] = substraction.squeeze()
-		window[windowSize[0]:windowSize[0]*2, 0:windowSize[1], 1] = substraction.squeeze()
-		window[windowSize[0]:windowSize[0]*2, 0:windowSize[1], 2] = substraction.squeeze()
+		window.showGrayAt((windowSize[0], 0, windowSize[0]*2, windowSize[1]), substraction)
+
 		# Bottom right: 1st stage recognition
-		window[windowSize[0]:windowSize[0]*2, windowSize[1]:windowSize[1]*2] = recognition
+		window.showAt((windowSize[0], windowSize[1], windowSize[0]*2, windowSize[1]*2), recognition)
 
-		currentWindow = window.copy()
-		writeText("Informacio:(esc per sortir)", (50,50), 1, currentWindow)
-		writeText("Frames: " + str(numframes), (50,80), 1, currentWindow)
+		window.text("Informacio:(esc per sortir)", (50,50), 1)
+		window.text("Frames: " + str(numframes), (50,80), 1)
 
-		cv2.imshow('BSaOR', currentWindow)
+		window.render()
 
-		k = cv2.waitKey(10)
+		key = cv2.waitKey(10)
 		numframes += 1
-		if k & 0xFF == 27:
+		if key & 0xFF == 27:
 			break
 
 	cv2.destroyAllWindows()
