@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+import platform
 
 # Background subtraction applied to object recognition
 
@@ -22,6 +23,11 @@ if __name__ == '__main__':
 
 	numframes = 0
 	capture = cv2.VideoCapture(0)
+	if(platform.system() == "Darwin"):
+		capture.set(3,300)
+		capture.set(4,240)
+
+
 	cv2.namedWindow('BSaOR', cv2.WINDOW_NORMAL)
 
 	_,frame = capture.read()
@@ -107,7 +113,7 @@ if __name__ == '__main__':
 						area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
 						mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
 
-					mask = cv2.medianBlur(mask, 9)
+					mask = cv2.medianBlur(mask, 9)#Intentem que no quedin forats
 					applied = np.multiply(gray, mask)
 					napp = (applied*255).astype('uint8')
 					contours,_ = cv2.findContours(napp, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
