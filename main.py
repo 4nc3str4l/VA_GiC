@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
 				# Apply K windows of size k
 				centroids = []
-				k = (50, 50)
+				k = (10, 10)
 				for i in xrange(1, mostChanges.shape[0], k[0]):
 					for j in xrange(1, mostChanges.shape[1], k[1]):
 						# Get centroid points
@@ -107,14 +107,14 @@ if __name__ == '__main__':
 						area = mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]]
 						mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = np.ones((area.shape[0],area.shape[1],1))
 
-					applied = np.multiply(BG, mask.squeeze()).astype('uint8')
-					print mask
-					contours,_ = cv2.findContours(applied, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-					cv2.drawContours(applied, contours, -1, (255, 0, 255))
-
 					mask = cv2.medianBlur(mask, 9)
-					cv2.imshow('Applied', mask * 255)
-					cv2.imshow('contours', applied)
+					applied = np.multiply(gray, mask)
+					napp = (applied*255).astype('uint8')
+					contours,_ = cv2.findContours(napp, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+					cv2.drawContours(napp, contours, -1, 255, 1, 8)
+
+					cv2.imshow('Applied', applied)
+					cv2.imshow('contours', napp)
 
 				"""
 				# Find boxes by looking for radius distances
