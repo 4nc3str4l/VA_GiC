@@ -12,35 +12,43 @@ import cnn
 
 
 ########################################################
-#				   CAFFE LOADING     				   #
+#				   	  CONSTANTS     				   #
 ########################################################
-bsaor_root = '/home/guillem/UB/Caffe/examples/bsaor/'
-cnn.load('/usr/local/caffe2/')
-cnn.init(
-	bsaor_root + 'bsaor.prototxt', 
-	bsaor_root + 'bsaor_train_lmdb.caffemodel',
-	cnn.mean(bsaor_root + 'bsaor_train_lmdb.binaryproto'),
-	channel_swap=(2,1,0),
-	raw_scale=255,
-	image_dims=(256, 256),
-	gpu=True
-)
+class Constants:
+	# Number of frames to sample before substraction happens
+	w = 20
+	# Learning rate
+	alpha = 0.1
+	# Minimum area of an object (in pixels^2)
+	min_area = 1500
+	# Centroids window size
+	k = (5, 5)
 
-# Windows array
-W = []
-# Number of frames to sample before substraction happens
-w = 20
-# Learning rate
-alpha = 0.1
-# Minimum area of an object (in pixels^2)
-min_area = 1500
-# Centroids window size
-k = (5, 5)
+########################################################
+#				   	    SYSTEM      				   #
+########################################################
+class System:
+	# Windows array
+	W = []
+	# Background initialization
+	BG = None
 
-# Background initialization
-BG = None
 
 if __name__ == '__main__':
+	########################################################
+	#				   CAFFE LOADING     				   #
+	########################################################
+	bsaor_root = '/home/guillem/UB/Caffe/examples/bsaor/'
+	cnn.load('/usr/local/caffe2/')
+	cnn.init(
+		bsaor_root + 'bsaor.prototxt', 
+		bsaor_root + 'bsaor_train_lmdb.caffemodel',
+		cnn.mean(bsaor_root + 'bsaor_train_lmdb.binaryproto'),
+		channel_swap=(2,1,0),
+		raw_scale=255,
+		image_dims=(256, 256),
+		gpu=True
+	)
 
 	# Setup some variables
 	numframes = 0
@@ -69,15 +77,15 @@ if __name__ == '__main__':
 		gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
 		# First frame?
-		if BG is None:
-			BG = gray
+		if System.BG is None:
+			System.BG = gray
 		else:
-			W.append(gray)
+			System.W.append(gray)
 
-			l = len(W)
-			if l == w:
+			l = len(System.W)
+			if l == Constants.w:
 				# Substract BG to current frame
-				mostChanges = np.abs(sum(W-BG))
+				mostChanges = np.abs(sum(System.W-System.BG))
 				
 				# Normalize max-min values
 				mostChanges = (mostChanges.clip(0, max=1)*255).astype('uint8')
@@ -93,10 +101,10 @@ if __name__ == '__main__':
 
 				# Apply K windows of size k to find centroids
 				centroids = []
-				for i in xrange(1, mostChanges.shape[0], k[0]):
-					for j in xrange(1, mostChanges.shape[1], k[1]):
+				for i in xrange(1, mostChanges.shape[0], Constants.k[0]):
+					for j in xrange(1, mostChanges.shape[1], Constants.k[1]):
 						# Get window points which different from 0
-						points = np.argwhere(mostChanges[i:i+k[0],j:j+k[0]])
+						points = np.argwhere(mostChanges[i:i+Constants.k[0],j:j+Constants.k[0]])
 
 						# Find center of mass
 						_len = len(points)
@@ -107,12 +115,12 @@ if __name__ == '__main__':
 							center = (y_sum/_len, x_sum/_len)
 
 							# [x1, y1, x2, y2, (cx, cy)]
-							rect = [(center[0] - k[1]/2, center[1] - k[0]/2),\
-									(center[0] + k[1]/2, center[1] + k[0]/2),\
+							rect = [(center[0] - Constants.k[1]/2, center[1] - Constants.k[0]/2),\
+									(center[0] + Constants.k[1]/2, center[1] + Constants.k[0]/2),\
 									center]
 
 							# [x, y, w, h]
-							ctr = (center[0] - k[1]/2, center[1] - k[0]/2, k[0], k[1])
+							ctr = (center[0] - Constants.k[1]/2, center[1] - Constants.k[0]/2, Constants.k[0], Constants.k[1])
 
 							centroids.append(ctr)
 
@@ -160,7 +168,7 @@ if __name__ == '__main__':
 						bottommost = c[:,:,1].max()
 
 						area = ((rightmost - leftmost)*(bottommost-topmost))
-						if area < min_area:
+						if area < Constants.min_area:
 							continue
 
 						for chi in range(0, 3):
@@ -183,12 +191,12 @@ if __name__ == '__main__':
 
 				# Get minimum and set new BG
 				m = difference.argmin()
-				BG = (1-alpha)*BG + alpha * W[m]
-				W = []
+				System.BG = (1-Constants.alpha)*System.BG + Constants.alpha * System.W[m]
+				System.W = []
 
 				# Set window parameters
 				# Top-Left: Background
-				window.showGrayAt((0, 0, windowSize[0], windowSize[1]), BG)
+				window.showGrayAt((0, 0, windowSize[0], windowSize[1]), System.BG)
 
 				# Top-Right: Substraction (mostChanges)
 				window.showGrayAt((0, windowSize[1], windowSize[0], windowSize[1]*2), mostChanges)
