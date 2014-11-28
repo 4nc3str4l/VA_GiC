@@ -38,6 +38,7 @@ if __name__ == '__main__':
 	########################################################
 	#				   CAFFE LOADING     				   #
 	########################################################
+	"""
 	bsaor_root = '/home/guillem/UB/Caffe/examples/bsaor/'
 	cnn.load('/usr/local/caffe2/')
 	cnn.init(
@@ -49,6 +50,7 @@ if __name__ == '__main__':
 		image_dims=(256, 256),
 		gpu=True
 	)
+	"""
 
 	# Setup some variables
 	numframes = 0
@@ -181,13 +183,13 @@ if __name__ == '__main__':
 						obj = frame[topmost:bottommost,leftmost:rightmost,:]
 						cv2.imshow('Obj' + str(i), obj)
 
-						prediction = net.predict([obj])
-						print np.argmax(prediction)
+						#prediction = net.predict([obj])
+						#print np.argmax(prediction)
 
 				# Compute difference of each frame with respect to BG
 				difference = np.zeros(l)
 				for i in range(0, l):
-					difference[i] = sum(sum(BG-W[i]))
+					difference[i] = sum(sum(System.BG-System.W[i]))
 
 				# Get minimum and set new BG
 				m = difference.argmin()
