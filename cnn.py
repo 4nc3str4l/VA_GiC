@@ -5,6 +5,16 @@ def load(caffe_root):
 	sys.path.insert(0, caffe_root + 'python')
 	global caffe
 	import caffe
+	caffe.enabled = True
+
+def set_enabled(enable):
+	caffe.enabled = enable
+
+def disable():
+	set_enabled(False)
+
+def enable():
+	set_enabled(True)
 
 def mean(mean, binaryproto = True):
 	if binaryproto:
@@ -22,8 +32,13 @@ def mean(mean, binaryproto = True):
 	return nparray
 
 def init(model, pretrained, npmean, **kwargs):
+	if not caffe.enabled:
+		return Classifier()
 
 	return caffe.Classifier(model, pretrained,
 		mean=npmean,
 		**kwargs)
 
+class Classifier():
+	def predict(a):
+		return -1

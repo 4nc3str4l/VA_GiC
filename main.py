@@ -28,8 +28,10 @@ class Constants:
 #				   	    SYSTEM      				   #
 ########################################################
 class System:
-	# Windows array
+	# Frames array
 	W = []
+	# Convolutional Neural Network
+	net = None
 	# Background initialization
 	BG = None
 
@@ -38,10 +40,10 @@ if __name__ == '__main__':
 	########################################################
 	#				   CAFFE LOADING     				   #
 	########################################################
-	"""
 	bsaor_root = '/home/guillem/UB/Caffe/examples/bsaor/'
 	cnn.load('/usr/local/caffe2/')
-	cnn.init(
+	cnn.disable()
+	System.net = cnn.init(
 		bsaor_root + 'bsaor.prototxt', 
 		bsaor_root + 'bsaor_train_lmdb.caffemodel',
 		cnn.mean(bsaor_root + 'bsaor_train_lmdb.binaryproto'),
@@ -50,7 +52,6 @@ if __name__ == '__main__':
 		image_dims=(256, 256),
 		gpu=True
 	)
-	"""
 
 	# Setup some variables
 	numframes = 0
@@ -101,90 +102,55 @@ if __name__ == '__main__':
 				recognition[:,:,0] = np.zeros((mostChanges.shape[0], mostChanges.shape[1]))
 				recognition[:,:,2] = np.zeros((mostChanges.shape[0], mostChanges.shape[1]))
 
-				# Apply K windows of size k to find centroids
-				centroids = []
-				for i in xrange(1, mostChanges.shape[0], Constants.k[0]):
-					for j in xrange(1, mostChanges.shape[1], Constants.k[1]):
-						# Get window points which different from 0
-						points = np.argwhere(mostChanges[i:i+Constants.k[0],j:j+Constants.k[0]])
+				# So... yeah
+				mask = cv2.medianBlur(mostChanges, 3)
+				mask = np.multiply(gray, mask)
+				mask = (mask*255).astype('uint8')
 
-						# Find center of mass
-						_len = len(points)
-						if _len > 0:
-							x_sum = np.sum(i + points[:,0])
-							y_sum = np.sum(j + points[:,1])
-							
-							center = (y_sum/_len, x_sum/_len)
+				# Filter out distance
+				mask = cv2.distanceTransform(mask, cv2.cv.CV_DIST_L1, 3)
+				mask = cv2.normalize(mask, mask, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+				mask = cv2.GaussianBlur(mask, (-3,-3), 0.5)
+				_,mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
 
-							# [x1, y1, x2, y2, (cx, cy)]
-							rect = [(center[0] - Constants.k[1]/2, center[1] - Constants.k[0]/2),\
-									(center[0] + Constants.k[1]/2, center[1] + Constants.k[0]/2),\
-									center]
+				#cv2.imshow('test', mask)
 
-							# [x, y, w, h]
-							ctr = (center[0] - Constants.k[1]/2, center[1] - Constants.k[0]/2, Constants.k[0], Constants.k[1])
+				contours,_ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
-							centroids.append(ctr)
+				applied = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
+				applied[:,:,0] = mask
 
-							#cv2.circle(recognition, ctr[2], 5, (0, 0, 255), 5)
-							cv2.rectangle(recognition, rect[0], rect[1], (255, 0, 0), 2)
+				colors = (\
+						(0, 100, 0),\
+						(0, 0, 100),\
+						(0, 100, 100),\
+						(100, 100, 100),\
+						(100, 0, 100),\
+						(255, 255, 255),\
+					)
+				i = 0
+				for c in contours:
+					leftmost = c[:,:,0].min()
+					rightmost = c[:,:,0].max()
+					topmost = c[:,:,1].min()
+					bottommost = c[:,:,1].max()
 
-				if centroids != []:
-					boxes,_ = cv2.groupRectangles(centroids, 0)
+					area = ((rightmost - leftmost)*(bottommost-topmost))
+					if area < Constants.min_area:
+						continue
 
-					mask = np.zeros((frame.shape[0], frame.shape[1], 1), 'uint8')
+					for chi in range(0, 3):
+						ch = np.array(applied[:,:,chi])
+						cv2.drawContours(ch, c, -1, colors[i % len(colors)][chi], 5)
+						applied[:,:,chi] = ch
 
-					for b in boxes:
-						mask[b[1]:b[1]+b[2],b[0]:b[0]+b[3]] = 1
+					i = i + 1
 
-					mask = cv2.medianBlur(mask, 3)
-					mask = np.multiply(gray, mask)
-					mask = (mask*255).astype('uint8')
+					obj = frame[topmost:bottommost,leftmost:rightmost,:]
+					cv2.imshow('Obj' + str(i), obj)
 
-					# Filter out distance
-					mask = cv2.distanceTransform(mask, cv2.cv.CV_DIST_L1, 3)
-					mask = cv2.normalize(mask, mask, 0, 255, cv2.NORM_MINMAX).astype('uint8')
-					mask = cv2.GaussianBlur(mask, (-3,-3), 0.5)
-					_,mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
-
-					#cv2.imshow('test', mask)
-
-					contours,_ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-					applied = np.zeros((frame.shape[0], frame.shape[1], frame.shape[2]))
-					applied[:,:,0] = mask
-
-					colors = (\
-							(0, 100, 0),\
-							(0, 0, 100),\
-							(0, 100, 100),\
-							(100, 100, 100),\
-							(100, 0, 100),\
-							(255, 255, 255),\
-						)
-					i = 0
-					for c in contours:
-						leftmost = c[:,:,0].min()
-						rightmost = c[:,:,0].max()
-						topmost = c[:,:,1].min()
-						bottommost = c[:,:,1].max()
-
-						area = ((rightmost - leftmost)*(bottommost-topmost))
-						if area < Constants.min_area:
-							continue
-
-						for chi in range(0, 3):
-							ch = np.array(applied[:,:,chi])
-							cv2.drawContours(ch, c, -1, colors[i % len(colors)][chi], 5)
-							applied[:,:,chi] = ch
-
-						i = i + 1
-
-						obj = frame[topmost:bottommost,leftmost:rightmost,:]
-						cv2.imshow('Obj' + str(i), obj)
-
-						#prediction = net.predict([obj])
-						#print np.argmax(prediction)
+					#prediction = net.predict([obj])
+					#print np.argmax(prediction)
 
 				# Compute difference of each frame with respect to BG
 				difference = np.zeros(l)
