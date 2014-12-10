@@ -121,32 +121,44 @@ if using_gevent:
 		print "\tTry reinstalling (conda install gevent | pip install gevent)."
 		print exc
 
-# Ask for folder
-folder = raw_input("Where do you want to save to? ")
+def start(folder, slug):
+	# Done
+	with open("done" + slug + ".txt", "a+") as d:
+		d.seek(0, 0)
+		done = [l.strip() for l in d]
 
-# Ask for file slug
-slug = raw_input("Which file slug would you want to use (word + slug + .txt)? ")
+	# Example use
+	with open('words' + slug + '.txt', 'r') as f:
+		unique = set([l.strip() for s in f for l in s.split("\t") if l not in done])
+		dic = [w for w in unique]
+		
+	random.shuffle(dic)
 
-# Done
-with open("done" + slug + ".txt", "a+") as d:
-	d.seek(0, 0)
-	done = [l.strip() for l in d]
+	with open("done" + slug + ".txt", "a") as d:
+		for w in dic:
+			print "\n[WORD] %s" % w
 
-# Example use
-with open('words' + slug + '.txt', 'r') as f:
-	unique = set([l.strip() for s in f for l in s.split("\t") if l not in done])
-	dic = [w for w in unique]
-	
-random.shuffle(dic)
+			# Save to done list
+			d.write(w + "\n")
 
-with open("done" + slug + ".txt", "a") as d:
-	for w in dic:
-		print "\n[WORD] %s" % w
+			# Get images
+			go(w, folder)
 
-		# Save to done list
-		d.write(w + "\n")
+	print "[OK] All images have been downloaded"
 
-		# Get images
-		go(w, folder)
 
-print "[OK] All images have been downloaded"
+# Autoload
+autoload = raw_input("Autoload file? [FILE / blank]? ")
+if autoload == "":
+
+	# Ask for folder
+	folder = raw_input("Where do you want to save to? ")
+
+	# Ask for file slug
+	slug = raw_input("Which file slug would you want to use (word + slug + .txt)? ")
+
+else:
+	with open(autoload, 'r') as f:
+		for l in f:
+			l = l.strip()
+			start('images/' + l, l)
