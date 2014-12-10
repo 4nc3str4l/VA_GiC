@@ -1,2 +1,10 @@
 .DS_Store
 *.pyc
+
+# Database folder
+Database/*
+!Database/google.py
+!Database/wordsRandom.txt
+!Database/wordsSuitcase.txt
+!Database/doneRandom.txt
+!Database/doneSuitcase.txt

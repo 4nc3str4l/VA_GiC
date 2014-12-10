@@ -1,0 +1,20 @@
+black	negro	swart	սեվ	crn	negre	zwart	sort	černá	noir	negro	schwarz	dubh	nero	ireng	Хар	nigrum	svart	czarny	preto	negru	черный	siyah
+white	blanco	wit	ճերմակ	bijel	blanc	wit	hvid	bílá	blanc	branco	Weiß	bán	bianco	putih	цагаан	album	hvit	biały	branco	alb	белый	beyaz
+yellow	amarillo	geel	դեղին գույն	žut	groc	geel	gul	žlutý	jaune	amarelo	gelb	buí	giallo	kuning	шар	flavo	gul	żółty	amarelo	galben	желтый	sarı
+blue	azul	blou	կապույտ	plava boja	blau	blauw	blå	modrý	bleu	azul	blau	gorm	blu	biru	хөх	caeruleum	blå	niebieski	azul	albastru	синий	mavi
+green	verde	groen	կանաչ	zelenilo	verd	groen	grøn	zelená	vert	verde	grün	glas	verde	ijo	ногоон	green	grønn	zielony	verde	verde	зеленый	yeşil
+noise	ruido	geraas	աղմուկ	buka	soroll	ruis	støj	hluk	bruit	ruído	Lärm	torann	rumore	gangguan	дуу чимээ	sonitus	støy	hałas	ruído	zgomot	шум	gürültü
+pencil	lápiz	potlood	մատիտ	olovka	llapis	potlood	blyant	tužka	crayon	lapis	Bleistift	peann luaidhe	matita	pencil	харандаа	plumbum	blyant	ołówek	lápis	creion	карандаш	kalem
+folder	carpeta	gids	թղթապանակ	fascikla	carpeta	map	mappe	Složka	dossier	dobrador	Mappe	fillteán	cartella	folder	хавтас	folder	mappen	Folder	dobrador	dosar	папка	dosya
+pen	pluma	pen	գրիչ	pero	ploma	pen	pen	pero	stylo	pluma	Stift	peann	penna	pen	үзэг	pen	penn	pióro	caneta	stilou	ручка	kalem
+light bulb	bombilla	gloeilamp	թեթեւ էլեկտրական լամպ	upaliti sijalicu	bombeta	gloeilamp	pære	žárovka	ampoule	lámpada eléctrica	Glühbirne	bolgán solais	lampadina	bohlam lampu	чийдэнгийн шил	lux bulbus	lyspære	żarówka	lâmpada elétrica	bec	лампочка	ampul
+bulb	bombilla	gloeilamp	լամպ	sijalica	bombeta	gloeilamp	pære	žárovka	ampoule	bulbo	Glühbirne	bolgán	lampadina	bohlam	чийдэнгийн	bulbus	pære	żarówka	bulbo	bec	лампа	ampul
+fluorescent bulb	bombilla fluorescente	fluorescent gloeilamp	ցերեկային լույսի էլեկտրական լամպ	fluorescentna žarulja	bombeta fluorescent	TL-lamp	fluorescerende pære	zářivka	ampoule fluorescente	lámpada fluorescente	Leuchtstofflampe	bolgán fluaraiseach	lampadina fluorescente	bohlam lampu neon	гэрэл гэгээтэй чийдэнгийн	fluorescent bulbi	fluorescerende pære	żarówki fluorescencyjne	lâmpada fluorescente	bec fluorescent	люминесцентные лампы	floresan ampul
+window	ventana	venster	պատուհան	prozor	finestra	venster	vindue	okno	fenêtre	ventá	Fenster	fuinneog	finestra	jendhela	цонх	fenestra	vindu	okno	janela	fereastră	окно	pencere
+dog	perro	hond	շուն	pas	gos	hond	hund	pes	chien	can	Hund	madra	cane	asu	нохой	dog	hund	pies	cão	câine	собака	köpek
+cat	gato	kat	կատու	mačka	gat	kat	kat	kočka	chat	gato	Katze	cat	gatto	kucing	муур	cat	katt	kot	gato	pisică	кот	kedi
+animal	animal	dier	կենդանի	životinja	animal	dier	dyr	zvíře	animal	animal	Tier	ainmhithe	animale	kewan	мал, амьтны	animal,	dyr	zwierzę	animal	animal	животное	hayvan
+watch	ver	kyk	դիտել	gledati	veure	horloge	ur	hodinky	regarder	reloxo	beobachten	féachaint ar	orologio	nonton	харах	vigilate	se	zegarek	relógio	ceas	смотреть	izlemek
+clock	reloj	klok	ժամացույց	sat	rellotge	klok	ur	hodiny	horloge	reloxo	Uhr	clog	orologio	jam	цаг	horologium	klokke	zegar	relógio	ceas	часы	saat
+table	mesa	tafel	սեղան	sto	taula	tafel	bord	stůl	table	táboa	Tabelle	tábla	tavolo	Tabel	хүснэгт	mensa	bord	tabela	tabela	tabel	стол	tablo
+chair	silla	stoel	աթոռ	stolica	cadira	stoel	stol	židle	chaise	materia	Stuhl	cathaoir	sedia	dhingklik	дарга	sella	stol	krzesło	cadeira	scaun	стул	sandalye

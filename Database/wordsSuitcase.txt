@@ -1,0 +1,6 @@
+suitcase	maleta	tas	ճամպրուկ	kofer	maleta	koffer	kuffert	kufr	valise	maleta	Koffer	suitcase	valigia	suitcase	авдар	Vidulus	koffert	walizka	mala	valiză	чемодан	bavul
+luggage	equipaje	bagasie	բագաժ	prtljag	equipatge	bagage	bagage	zavazadla	bagage	equipaxe	Gepäck	bagáiste	bagaglio	bagasi	ачаа тээшний	sarcinas	bagasjen	bagaż	bagagem	bagaje	багаж	bagaj
+bag	bolsa	sak	պայուսակ	torba	borsa	zak	taske	taška	sac	saco	Tasche	mála	borsa	tas	баг	lapides sacculi	pose	torba	saco	sac	мешок	çanta
+case	caso	geval	գործ	slučaj	cas	geval	tilfælde	pouzdro	cas	caso	Fall	cás	caso	cilik	хэрэг	causam	saken	sprawa	caso	caz	дело	durum
+suit bag	portatrajes	pak sak	կոստյում պայուսակ	odijelo bag	portavestits	pak zak	dragt pose	oblek bag	sac de costume	saco de roupa	Kleidersack	mála oireann	bag vestito	tas miturut	нэхэмжлэл баг	suit sacculi	dress bag	Torba na garnitur	saco de roupa	sac costum	костюм мешок	takım çantası
+overnighter	overnighter	overnighter	overnighter	OVERNIGHTER	overnighter	overnighter	overnighter	overnighter	overnighter	frasqueira	nighter	overnighter	pernottamento	overnighter	overnighter	Overnighter	overnighter	krewnego	frasqueira	overnighter	Overnighter	overnighter

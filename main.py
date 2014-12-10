@@ -42,14 +42,13 @@ if __name__ == '__main__':
 	########################################################
 	bsaor_root = '/home/guillem/UB/Caffe/examples/bsaor/'
 	cnn.load('/usr/local/caffe2/')
-	cnn.disable()
+	#cnn.disable()
 	System.net = cnn.init(
 		bsaor_root + 'bsaor.prototxt', 
-		bsaor_root + 'bsaor_train_lmdb.caffemodel',
-		cnn.mean(bsaor_root + 'bsaor_train_lmdb.binaryproto'),
-		channel_swap=(2,1,0),
+		bsaor_root + 'bsaor_iter_6000.caffemodel',
+		cnn.mean(bsaor_root + 'bsaor_train_lmdb.binaryproto').reshape(3, 150, 150),
 		raw_scale=255,
-		image_dims=(256, 256),
+		image_dims=(150, 150),
 		gpu=True
 	)
 
@@ -128,6 +127,7 @@ if __name__ == '__main__':
 						(100, 0, 100),\
 						(255, 255, 255),\
 					)
+				objs = []
 				i = 0
 				for c in contours:
 					leftmost = c[:,:,0].min()
@@ -148,9 +148,11 @@ if __name__ == '__main__':
 
 					obj = frame[topmost:bottommost,leftmost:rightmost,:]
 					cv2.imshow('Obj' + str(i), obj)
+					objs.append(obj)
 
-					#prediction = net.predict([obj])
-					#print np.argmax(prediction)
+				if objs != []:
+					prediction = System.net.predict(objs)
+					print prediction
 
 				# Compute difference of each frame with respect to BG
 				difference = np.zeros(l)
