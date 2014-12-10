@@ -40,5 +40,5 @@ def init(model, pretrained, npmean, **kwargs):
 		**kwargs)
 
 class Classifier():
-	def predict(a):
+	def predict(self, ims):
 		return -1

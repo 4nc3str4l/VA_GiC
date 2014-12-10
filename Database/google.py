@@ -70,7 +70,8 @@ def go(query, folder):
 			js = json.loads(r.text)
 
 			if js is None or not 'responseData' in js or js['responseData'] is None:
-				print '\t[FAIL] JSON response is invalid, possible ToS abuse'
+				print '\t[FAIL] JSON response is invalid.'
+				print '\t[DETAIL] ', js['responseDetails']
 				exit(0)
 
 			for image_info in js['responseData']['results']:
