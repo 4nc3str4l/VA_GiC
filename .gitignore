@@ -16,3 +16,7 @@ Database/*
 # But then again, ignore doneSlug.txt files
 Database/done*.txt
 
+# Models folder
+*.caffemodel
+*.solverstate
+*.mdb

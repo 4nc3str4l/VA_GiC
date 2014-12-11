@@ -30,14 +30,16 @@ class System:
 #				   	  CONSTANTS      				   #
 ########################################################
 class Constants:
-	labels = ('Face', 'Suitcase', 'Black', 'Blue', 'Gray', 'Yellow')
+	labels = ('Face', 'Face-2', 'Suitcase', 'Black', 'Blue', 'Gray', 'Yellow', 'Skin')
 	colors = (\
+		(0, .75, 0),\
 		(0, 1, 0),\
 		(0, 0, 1),\
 		(0.10, 0.10, 0.10),\
 		(1, 0, 0),\
 		(0.5, 0.5, 0.5),\
 		(0, 1, 1),\
+		(0, .5, .5)\
 	)
 
 

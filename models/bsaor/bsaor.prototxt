@@ -179,7 +179,7 @@ layers {
   weight_decay: 1
   weight_decay: 0
   inner_product_param {
-    num_output: 6
+    num_output: 7
     weight_filler {
       type: "xavier"
     }
