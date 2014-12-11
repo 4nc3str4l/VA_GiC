@@ -129,20 +129,25 @@ def start(folder, slug):
 
 	# Example use
 	with open('words' + slug + '.txt', 'r') as f:
-		unique = set([l.strip() for s in f for l in s.split("\t") if l not in done])
+		unique = set([l.strip() for s in f for l in s.split("\t") if l.strip() not in done])
 		dic = [w for w in unique]
 		
 	random.shuffle(dic)
 
 	with open("done" + slug + ".txt", "a") as d:
+		i = 1
+		m = len(dic)
 		for w in dic:
-			print "\n[WORD] %s" % w
+			print "\n[%d/%d][WORD] %s" % (i, m, w)
 
 			# Save to done list
 			d.write(w + "\n")
 
 			# Get images
 			go(w, folder)
+
+			# Update
+			i = i + 1
 
 	print "[OK] All images have been downloaded"
 
@@ -158,7 +163,20 @@ if autoload == "":
 	slug = raw_input("Which file slug would you want to use (word + slug + .txt)? ")
 
 else:
+	with open("done" + autoload, "a+") as d:
+		d.seek(0, 0)
+		done = [l.strip() for l in d]
+
 	with open(autoload, 'r') as f:
-		for l in f:
-			l = l.strip()
-			start('images/' + l, l)
+		unique = set([l.strip() for s in f for l in s.split("\t") if l.strip() not in done])
+		dic = [w for w in unique]
+
+	with open("done" + autoload, "a") as d:
+		for w in dic:
+			print "\n[FILE] %s" % w
+
+			# Start downloading list
+			start('images/' + w, w)
+
+			# Save to done list
+			d.write(w + "\n")
