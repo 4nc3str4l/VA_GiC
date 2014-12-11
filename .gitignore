@@ -1,10 +1,18 @@
+# MAC files
 .DS_Store
+
+# Python compiled objects
 *.pyc
 
+# Caffe models (exceed 100MB limit)
+*.caffemodel
+
 # Database folder
+# Ignore all
 Database/*
+# Except python and txt
 !Database/google.py
-!Database/wordsRandom.txt
-!Database/wordsSuitcase.txt
-!Database/doneRandom.txt
-!Database/doneSuitcase.txt
+!Database/*.txt
+# But then again, ignore doneSlug.txt files
+Database/done*.txt
+

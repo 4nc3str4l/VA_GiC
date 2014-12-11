@@ -1,38 +1,9 @@
 name: "BSaOR"
-layers {
-  name: "bsaor"
-  type: DATA
-  top: "data"
-  top: "label"
-  data_param {
-    source: "models/bsaor/bsaor_train_lmdb"
-    backend: LMDB
-    batch_size: 50
-  }
-  transform_param {
-    crop_size: 95
-    mirror: true
-    mean_file: "models/bsaor/bsaor_train_lmdb.binaryproto"
-  }
-  include: { phase: TRAIN }
-}
-layers {
-  name: "bsaor"
-  type: DATA
-  top: "data"
-  top: "label"
-  data_param {
-    source: "models/bsaor/bsaor_test_lmdb"
-    backend: LMDB
-    batch_size: 10
-  }
-  transform_param {
-    crop_size: 95
-    mirror: false
-    mean_file: "models/bsaor/bsaor_train_lmdb.binaryproto"
-  }
-  include: { phase: TEST }
-}
+input: "data"
+input_dim: 5
+input_dim: 3
+input_dim: 95
+input_dim: 95
 
 layers {
   name: "conv1"
@@ -208,7 +179,7 @@ layers {
   weight_decay: 1
   weight_decay: 0
   inner_product_param {
-    num_output: 7
+    num_output: 8
     weight_filler {
       type: "xavier"
     }
@@ -218,19 +189,9 @@ layers {
     }
   }
 }
-
 layers {
-  name: "accuracy"
-  type: ACCURACY
+  name: "prob"
+  type: SOFTMAX
   bottom: "fc8"
-  bottom: "label"
-  top: "accuracy"
-  include: { phase: TEST }
-}
-layers {
-  name: "loss"
-  type: SOFTMAX_LOSS
-  bottom: "fc8"
-  bottom: "label"
-  top: "loss"
+  top: "prob"
 }

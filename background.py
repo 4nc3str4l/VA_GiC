@@ -21,24 +21,35 @@ class RunningBackground:
 		self.min_area = min_area
 
 		# Visualization
-		self.mask = None
+		self.__mask = None
+		self.__mostChanges = None
+		self.__recognition = None
+
 
 	def getBG(self):
 		return self.BG
 
 	def getMask(self):
-		return self.mask
+		return self.__mask
+
+	def getMostChanges(self):
+		return self.__mostChanges
+
+	def getRecognition(self):
+		return self.__recognition
 
 	def feed(self, gray):
 		# assert(len(gray.shape) == 2 || gray.shape[2] == 1)
 		objs = []
 		self.W.append(gray)
+		update = False
 
 		if self.BG is None:
 			self.BG = gray
 		else:
 			l = len(self.W)
 			if l == self.frameSampling:
+				update = True
 				objs = self.__segment(gray)
 
 				# Compute difference of each frame with respect to BG
@@ -52,7 +63,7 @@ class RunningBackground:
 			
 				self.W = []
 
-		return objs
+		return update, objs
 
 
 	def __segment(self, gray):
@@ -61,10 +72,12 @@ class RunningBackground:
 		
 		# Normalize max-min values
 		mostChanges = (mostChanges.clip(0, max=1)*255).astype('uint8')
+		self.__recognition = mostChanges.copy()
 
 		# Apply a threshold
 		_,mostChanges = cv2.threshold(mostChanges, 150, 255, cv2.THRESH_BINARY)
 		mostChanges = cv2.medianBlur(mostChanges, 9)
+		self.__mostChanges = mostChanges.copy()
 
 		# Apply median filter and multiply with the current scene
 		mask = cv2.medianBlur(mostChanges, 3)
@@ -80,8 +93,7 @@ class RunningBackground:
 		# Apply threshold again to mask out real low values 
 		# (Almost black zones, thus possible unions between objects)
 		_,mask = cv2.threshold(mask, 10, 255, cv2.THRESH_BINARY)
-
-		self.mask = mask.copy()
+		self.__mask = mask.copy()
 
 		contours,_ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 

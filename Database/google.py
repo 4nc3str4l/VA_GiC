@@ -162,6 +162,9 @@ if autoload == "":
 	# Ask for file slug
 	slug = raw_input("Which file slug would you want to use (word + slug + .txt)? ")
 
+	# Start reading file
+	start(folder, slug)
+
 else:
 	with open("done" + autoload, "a+") as d:
 		d.seek(0, 0)

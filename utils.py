@@ -8,6 +8,7 @@ class Window:
 
 		self.__window = np.zeros((w, h, 3), 'double')
 		self.__texts = []
+		self.__perm_texts = []
 
 	def open(self, title):
 		self.__title = title
@@ -47,14 +48,23 @@ class Window:
 	def buffer(self, size, datatype = 'double'):
 		return np.zeros(size, datatype)
 
-	def text(self, text, pos, size):
-		self.__texts.append((text, pos, size))
+	def text(self, text, pos, size, color = (255, 255, 255), thickness = 1):
+		self.__texts.append((text, pos, size, color, thickness))
+
+	def perm_text(self, text, pos, size, color = (255, 255, 255), thickness = 1):
+		self.__perm_texts.append((text, pos, size, color, thickness))
+
+	def forget_text(self):
+		self.__perm_texts = []
 
 	def render(self):
 		renderMatrix = self.__window.copy()
 
 		for t in self.__texts:
-			cv2.putText(renderMatrix, t[0], t[1], cv2.FONT_HERSHEY_SIMPLEX, t[2], (255,255,255))
+			cv2.putText(renderMatrix, t[0], t[1], cv2.FONT_HERSHEY_SIMPLEX, t[2], t[3], t[4])
 		self.__texts = []
+
+		for t in self.__perm_texts:
+			cv2.putText(renderMatrix, t[0], t[1], cv2.FONT_HERSHEY_SIMPLEX, t[2], t[3], t[4])
 
 		cv2.imshow(self.__title, renderMatrix)
