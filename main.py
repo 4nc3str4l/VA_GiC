@@ -30,16 +30,17 @@ class System:
 #				   	  CONSTANTS      				   #
 ########################################################
 class Constants:
-	labels = ('Face', 'Face-2', 'Suitcase', 'Black', 'Blue', 'Gray', 'Yellow', 'Skin')
+	labels = ('Face', 'Suitcase', 'Black', 'Blue', 'Gray', 'Yellow', 'Skin', 'Purple', 'Face-only')
 	colors = (\
-		(0, .75, 0),\
 		(0, 1, 0),\
 		(0, 0, 1),\
 		(0.10, 0.10, 0.10),\
 		(1, 0, 0),\
 		(0.5, 0.5, 0.5),\
 		(0, 1, 1),\
-		(0, .5, .5)\
+		(0, .5, .5),\
+		(.5, 0, .5),\
+		(0, .75, 0),\
 	)
 
 
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 	#cnn.disable()
 	System.net = cnn.init(
 		'models/bsaor/bsaor.prototxt', 
-		'models/bsaor/bsaor_iter_3000.caffemodel',
+		'models/bsaor/bsaor_iter_15000.caffemodel',
 		cnn.mean('models/bsaor/bsaor_train_lmdb.binaryproto').reshape(3, 100, 100),
 		raw_scale=255,
 		image_dims=(95, 95),
