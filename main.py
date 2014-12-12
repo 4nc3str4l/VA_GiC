@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	#cnn.disable()
 	System.net = cnn.init(
 		'models/bsaor/bsaor.prototxt', 
-		'models/bsaor/bsaor_iter_15000.caffemodel',
+		'models/bsaor/bsaor_iter_5000.caffemodel',
 		cnn.mean('models/bsaor/bsaor_train_lmdb.binaryproto').reshape(3, 100, 100),
 		raw_scale=255,
 		image_dims=(95, 95),

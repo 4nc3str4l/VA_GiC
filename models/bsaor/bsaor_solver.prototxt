@@ -3,11 +3,11 @@ net: "models/bsaor/bsaor_train_test.prototxt"
 # test_iter specifies how many forward passes the test should carry out.
 # In the case of MNIST, we have test batch size 100 and 100 test iterations,
 # covering the full 10,000 testing images.
-test_iter: 100
+test_iter: 25
 # Carry out testing every 500 training iterations.
 test_interval: 500
 # The base learning rate, momentum and the weight decay of the network.
-base_lr: 0.001
+base_lr: 0.01
 momentum: 0.9
 weight_decay: 0.0005
 # The learning rate policy
@@ -18,7 +18,7 @@ weight_decay: 0.0005
 
 lr_policy: "step"
 gamma: 0.1
-stepsize: 100000
+stepsize: 10000
 
 # Display every 100 iterations
 display: 100
