@@ -65,6 +65,11 @@ class RunningBackground:
 
 		return update, objs
 
+	def __contains(self, b1, b2):
+		return b1[0] <= b2[0] and 
+			b1[1] <= b2[1] and
+			b1[2] >= b2[2] and
+			b1[3] >= b2[3]
 
 	def __segment(self, gray):
 		# Substract BG to current frame
@@ -109,6 +114,18 @@ class RunningBackground:
 				continue
 
 			objs.append((leftmost, rightmost, topmost, bottommost))
+
+		found = 1
+		while found > 0:
+			found = 0
+
+			for a in objs:
+				for b in objs:
+					if a != b:
+						if self.__contains(a, b):
+							objs.remove(b)
+							found = 1
+							break
 
 		return objs
 
