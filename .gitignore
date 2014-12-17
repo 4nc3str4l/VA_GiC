@@ -20,3 +20,6 @@ Database/done*.txt
 *.caffemodel
 *.solverstate
 *.mdb
+
+# IPython
+.ipynb_checkpoints/*
