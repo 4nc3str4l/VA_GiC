@@ -6,9 +6,13 @@ Visió Artificial: Guillem Pascual i Cristian Muriel
 Getting pre-trained cnn
 ------
 
-Our pre-trained caffemodel might be downloaded from:
+Our pre-trained caffemodel might be downloaded from, by iterations number:
 
-https://www.dropbox.com/s/tzpob4ogqh0t9cy/bsaor_iter_50000.caffemodel?dl=0
+* 5000: https://www.dropbox.com/s/8mcnj8j5hhytn6z/bsaor_iter_5000.caffemodel?dl=0
+* 10000: https://www.dropbox.com/s/yw5535ckknlo17d/bsaor_iter_10000.caffemodel?dl=0
+* 15000: https://www.dropbox.com/s/g5gh7lmab31d0x5/bsaor_iter_15000.caffemodel?dl=0
+* 20000: https://www.dropbox.com/s/vuxo1ayux971z84/bsaor_iter_20000.caffemodel?dl=0 
+* 25000: https://www.dropbox.com/s/y81588ziy4iglyj/bsaor_iter_25000.caffemodel?dl=0
 
 And be freely used. We would, however, appreciate being cited, as does caffe.
 
